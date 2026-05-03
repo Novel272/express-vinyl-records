@@ -1,10 +1,52 @@
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 import path from "node:path";
-import { vinyl } from "./data/data.js";
 
 async function CreateTable() {
   const db = await open({
+    filename: path.join(process.cwd(), "database.db"),
+    driver: sqlite3.Database,
+  });
+  try {
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS users
+      (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            email TEXT UNIQUE NOT NULL,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+      `);
+  } catch (error) {
+    console.error("Error creating table:", error);
+  }
+  await db.close();
+}
+
+CreateTable();
+/*
+for(const {location,data}of databseobject){
+await db.run(
+"INSERT INTO NAMEofDATAsQL(location,data)
+VALUES(?,?)placeHolders
+[location,data]
+"
+)
+}
+
+
+GETTING DATA
+
+    const query = 'SELECT * FROM TableName WHERE filter = ?'
+    const params = [filterValue]
+
+    const abductions = await db.all(query, params)
+
+*/
+
+/*const db = await open({
     filename: path.join("database.db"),
     driver: sqlite3.Database,
   });
@@ -38,26 +80,4 @@ async function CreateTable() {
     console.error("Error inserting data:", error);
   } finally {
     await db.close();
-  }
-}
-
-CreateTable();
-/*
-for(const {location,data}of databseobject){
-await db.run(
-"INSERT INTO NAMEofDATAsQL(location,data)
-VALUES(?,?)placeHolders
-[location,data]
-"
-)
-}
-
-
-GETTING DATA
-
-    const query = 'SELECT * FROM TableName WHERE filter = ?'
-    const params = [filterValue]
-
-    const abductions = await db.all(query, params)
-
-*/
+  }*/
