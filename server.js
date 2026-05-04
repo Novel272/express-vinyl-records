@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { ProductRouter } from "./route/products.js";
 import AuthRouter from "./route/authRouter.js";
+import meRouter from "./route/meRouter.js";
 import session from "express-session";
 import dotenv from "dotenv";
 
@@ -45,6 +46,7 @@ app.use(
 
 app.use(express.static("public")); // Serve static files from the "public" directory
 app.use("/api/products", ProductRouter); // Use the ProductRouter for routes starting with /api/products
+app.use("/api/auth/me", meRouter); // Use the meRouter for routes starting with /api/auth/me
 app.use("/api/auth", AuthRouter); // Use the AuthRouter for routes starting with /api/auth
 
 // Handle undefined routes
