@@ -5,6 +5,7 @@ import AuthRouter from "./route/authRouter.js";
 import meRouter from "./route/meRouter.js";
 import session from "express-session";
 import dotenv from "dotenv";
+import CartRouter from "./route/CartRouter.js";
 
 dotenv.config();
 
