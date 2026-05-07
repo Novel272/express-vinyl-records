@@ -4,7 +4,7 @@ import { getDBConnection } from "../db/db";
 export async function AddToCart(req, res) {
   let { ProductId } = parseInt(req.body.productId, 10);
 
-  if (isNaN(productId)) {
+  if (isNaN(productId) || !ProductId) {
     return res.status(400).json({ error: "Invalid product ID" });
   }
 
@@ -31,11 +31,12 @@ export async function AddToCart(req, res) {
         [userId, ProductId],
       );
     }
-    await db.close();
     return res.status(200).json({ message: "Added to cart" });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Server error" });
+  } finally {
+    await db.close();
   }
 }
 
@@ -56,20 +57,62 @@ export async function GetCartCount(req, res) {
     console.error(err);
     return res.status(500).json({ error: "Server error" });
   }
-  /*
-Challenge:
+}
 
-1. Write code to ensure that when a logged-in user clicks 'Add to Cart', 
-their current cart count is shown in the header with a cart icon.
- The frontend has been done for you. All the backend need do is provide the following JSON on the /api/cart/cart-count endpoint: 
-{ <THE TOTAL NUMBER OF THE USER'S ITEMS> || 0 }
+export async function GetAll(req, res) {
+  const db = await getDBConnection();
 
-Ignore frontend console errors for now!
- 
-For testing, log in with:
-Username: test
-Password: test
+  const items = await db.all(
+    `SELECT ci.id AS cartItemId, ci.quantity, p.title, p.artist, p.price FROM cart_items ci JOIN products p ON p.id = ci.product_id WHERE ci.user_id = ?`,
+    [req.session.userId],
+  );
 
-Loads of help in hint.md
-*/
+  res.json({ items: items });
+}
+
+export async function deleteItem(req, res) {
+  const db = await getDBConnection();
+  const UserId = req.session.userId;
+  const itemId = parseInt(req.params.itemId, 10);
+  if (isNaN(itemId) || !UserId) {
+    await db.close();
+    return res
+      .status(400)
+      .json({ error: "Invalid item ID or user not logged in" });
+  }
+  try {
+    const item = await db.get(
+      "SELECT quantity FROM cart_items WHERE id = ? AND user_id = ?",
+      [itemId, req.session.userId],
+    );
+
+    if (!item) {
+      return res.status(400).json({ error: "Item not found" });
+    }
+    const result = await db.run(
+      `DELETE FROM cart_items WHERE id=? AND user_id=?`,
+      [itemId, UserId],
+    );
+    await db.close();
+    return res.status(204).send();
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Server error" });
+  }
+}
+
+export async function deleteAll(req, res) {
+  const db = await getDBConnection();
+  const UserId = req.session.userId;
+  try {
+    if (!UserId) {
+      return res.status(401).json({ error: "Please log in first" });
+    }
+    await db.run(`DELETE FROM cart_items WHERE user_id=?`, [UserId]);
+    await db.close();
+    return res.status(204).send();
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Server error" });
+  }
 }
