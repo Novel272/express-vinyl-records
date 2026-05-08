@@ -10,56 +10,41 @@ export async function AddToCart(req, res) {
     await db.close();
     return res.status(400).json({ error: "Invalid product ID" });
   }
+  const userId = req.session.userId;
 
-  try {
-    const userId = req.session.userId;
+  if (!userId) {
+    return res.status(401).json({ error: "Please log in first" });
+  }
 
-    if (!userId) {
-      return res.status(401).json({ error: "Please log in first" });
-    }
+  const existingCartItem = await db.get(
+    `SELECT * FROM cart_items WHERE user_id=? AND product_id=?`,
+    [userId, ProductId],
+  );
 
-    const existingCartItem = await db.get(
-      `SELECT * FROM cart_items WHERE user_id=? AND product_id=?`,
+  if (existingCartItem) {
+    await db.run(`UPDATE cart_items SET quantity = quantity + 1 WHERE id=?`, [
+      existingCartItem.id,
+    ]);
+  } else {
+    await db.run(
+      `INSERT INTO cart_items (user_id,product_id,quantity) VALUES (?,?,1)`,
       [userId, ProductId],
     );
-
-    if (existingCartItem) {
-      await db.run(`UPDATE cart_items SET quantity = quantity + 1 WHERE id=?`, [
-        existingCartItem.id,
-      ]);
-    } else {
-      await db.run(
-        `INSERT INTO cart_items (user_id,product_id,quantity) VALUES (?,?,1)`,
-        [userId, ProductId],
-      );
-    }
-    return res.status(200).json({ message: "Added to cart" });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "Server error" });
-  } finally {
-    if (db) await db.close();
   }
+  res.status(200).json({ message: "Added to cart" });
 }
 
 export async function GetCartCount(req, res) {
   const userId = req.session.userId;
   const db = await getDBConnection();
-  try {
-    if (!userId) {
-      return res.status(401).json({ error: "Please log in first" });
-    }
-    const CartCount = await db.get(
-      `SELECT SUM(quantity) as count FROM cart_items WHERE user_id=?`,
-      [userId],
-    );
-    return res.status(200).json({ count: CartCount.count || 0 });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "Server error" });
-  } finally {
-    if (db) await db.close();
+  if (!userId) {
+    return res.status(401).json({ error: "Please log in first" });
   }
+  const CartCount = await db.get(
+    `SELECT SUM(quantity) AS totalItems FROM cart_items WHERE user_id=?`,
+    [userId],
+  );
+  res.json({ totalItems: CartCount.totalItems || 0 });
 }
 
 export async function GetAll(req, res) {
@@ -101,7 +86,7 @@ export async function deleteItem(req, res) {
       `DELETE FROM cart_items WHERE id=? AND user_id=?`,
       [itemId, UserId],
     );
-    return res.status(204).send();
+    res.status(204).send();
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Server error" });
@@ -118,7 +103,7 @@ export async function deleteAll(req, res) {
       return res.status(401).json({ error: "Please log in first" });
     }
     await db.run(`DELETE FROM cart_items WHERE user_id=?`, [UserId]);
-    return res.status(204).send();
+    res.status(204).send();
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Server error" });
