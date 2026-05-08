@@ -7,9 +7,9 @@ import {
   deleteItem,
 } from "../controller/cartController.js";
 
-import required from "../MiddleWare/required.js";
+import { required } from "../MiddleWare/required.js";
 
-const CartRouter = express.Router();
+export const CartRouter = express.Router();
 CartRouter.post("/add", required, AddToCart);
 CartRouter.get("/cart-count", required, GetCartCount);
 CartRouter.get("/", required, GetAll);

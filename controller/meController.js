@@ -1,4 +1,4 @@
-import { getDBConnection } from "../db/db";
+import { getDBConnection } from "../db/db.js";
 
 export async function getCurrentUser(req, res) {
   try {
@@ -8,8 +8,8 @@ export async function getCurrentUser(req, res) {
     }
     if (req.session.usedId) {
       const loog = `SELECT name from users where id=?`;
-      const user= await db.get(loog, [req.session.userId]);
-      res.json({isLoggedIn=true,name:user.name})
+      const user = await db.get(loog, [req.session.userId]);
+      res.json({ isLoggedIn: true, name: user.name });
     }
   } catch (err) {
     console.error("getCurrentUser error:", err);

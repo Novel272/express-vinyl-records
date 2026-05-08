@@ -2,11 +2,7 @@ import validator from "validator";
 import { getDBConnection } from "../db/db.js";
 import bcrypt from "bcryptjs";
 
-export function AuthController(req, res) {
-  console.log("authentication", req.body);
-}
-
-export async function registerUser(req, res) {
+export async function AuthController(req, res) {
   let regex = /^[a-zA-Z0-9_-]{1,20}$/;
   let { name, email, username, password } = req.body;
   if (!name || !email || !username || !password) {
@@ -102,16 +98,3 @@ export async function LogOutUser(req, res) {
     return res.status(200).json({ message: "logged out" });
   });
 }
-/*
-Challenge:
-1. Create a function which logs out the user. 
-- You can use the .destroy() method directly on the session.
-- .destroy() takes a callback function which you can use to send a confirmation response with this JSON:
-  { message: 'Logged out' }
-
-You will need to write code here and in one other place!
-
-Test with:
-username: test
-password: test
-*/

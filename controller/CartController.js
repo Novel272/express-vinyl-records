@@ -1,6 +1,7 @@
-import { OPEN_READWRITE } from "sqlite3";
-import { getDBConnection } from "../db/db";
+import pkg from "sqlite3";
+import { getDBConnection } from "../db/db.js";
 
+const { OPEN_READWRITE } = pkg;
 export async function AddToCart(req, res) {
   let { ProductId } = parseInt(req.body.productId, 10);
 
