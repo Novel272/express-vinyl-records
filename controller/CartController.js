@@ -3,14 +3,15 @@ import { getDBConnection } from "../db/db.js";
 
 const { OPEN_READWRITE } = pkg;
 export async function AddToCart(req, res) {
-  let { ProductId } = parseInt(req.body.productId, 10);
+  let ProductId = parseInt(req.body.productId, 10);
+  const db = await getDBConnection();
 
-  if (isNaN(productId) || !ProductId) {
+  if (isNaN(ProductId)) {
+    await db.close();
     return res.status(400).json({ error: "Invalid product ID" });
   }
 
   try {
-    const db = await getDBConnection();
     const userId = req.session.userId;
 
     if (!userId) {
@@ -23,7 +24,7 @@ export async function AddToCart(req, res) {
     );
 
     if (existingCartItem) {
-      await db.run(`UPDATE cart_items SET quantity=quantity+1 WHERE id=?`, [
+      await db.run(`UPDATE cart_items SET quantity = quantity + 1 WHERE id=?`, [
         existingCartItem.id,
       ]);
     } else {
@@ -37,14 +38,14 @@ export async function AddToCart(req, res) {
     console.error(err);
     return res.status(500).json({ error: "Server error" });
   } finally {
-    await db.close();
+    if (db) await db.close();
   }
 }
 
 export async function GetCartCount(req, res) {
   const userId = req.session.userId;
+  const db = await getDBConnection();
   try {
-    const db = await getDBConnection();
     if (!userId) {
       return res.status(401).json({ error: "Please log in first" });
     }
@@ -52,23 +53,29 @@ export async function GetCartCount(req, res) {
       `SELECT SUM(quantity) as count FROM cart_items WHERE user_id=?`,
       [userId],
     );
-    await db.close();
     return res.status(200).json({ count: CartCount.count || 0 });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Server error" });
+  } finally {
+    if (db) await db.close();
   }
 }
 
 export async function GetAll(req, res) {
   const db = await getDBConnection();
-
-  const items = await db.all(
-    `SELECT ci.id AS cartItemId, ci.quantity, p.title, p.artist, p.price FROM cart_items ci JOIN products p ON p.id = ci.product_id WHERE ci.user_id = ?`,
-    [req.session.userId],
-  );
-
-  res.json({ items: items });
+  try {
+    const items = await db.all(
+      `SELECT ci.id AS cartItemId, ci.quantity, p.title, p.artist, p.price FROM cart_items ci JOIN products p ON p.id = ci.product_id WHERE ci.user_id = ?`,
+      [req.session.userId],
+    );
+    res.json({ items: items });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Server error" });
+  } finally {
+    if (db) await db.close();
+  }
 }
 
 export async function deleteItem(req, res) {
@@ -94,11 +101,12 @@ export async function deleteItem(req, res) {
       `DELETE FROM cart_items WHERE id=? AND user_id=?`,
       [itemId, UserId],
     );
-    await db.close();
     return res.status(204).send();
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Server error" });
+  } finally {
+    if (db) await db.close();
   }
 }
 
@@ -110,10 +118,11 @@ export async function deleteAll(req, res) {
       return res.status(401).json({ error: "Please log in first" });
     }
     await db.run(`DELETE FROM cart_items WHERE user_id=?`, [UserId]);
-    await db.close();
     return res.status(204).send();
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Server error" });
+  } finally {
+    if (db) await db.close();
   }
 }

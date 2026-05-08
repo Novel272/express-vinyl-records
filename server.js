@@ -49,7 +49,7 @@ app.use(express.static("public")); // Serve static files from the "public" direc
 app.use("/api/products", ProductRouter); // Use the ProductRouter for routes starting with /api/products
 app.use("/api/auth/me", meRouter); // Use the meRouter for routes starting with /api/auth/me
 app.use("/api/auth", AuthRouter); // Use the AuthRouter for routes starting with /api/auth
-app.use("/cart", CartRouter); // Use the CartRouter for routes starting with /cart
+app.use("/api/cart", CartRouter); // Use the CartRouter for routes starting with /cart
 
 // Handle undefined routes
 app.get((req, res) => {

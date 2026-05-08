@@ -6,7 +6,7 @@ export async function getCurrentUser(req, res) {
     if (!req.session.userId) {
       return res.json({ isLoggedIn: false });
     }
-    if (req.session.usedId) {
+    if (req.session.userId) {
       const loog = `SELECT name from users where id=?`;
       const user = await db.get(loog, [req.session.userId]);
       res.json({ isLoggedIn: true, name: user.name });

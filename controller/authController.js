@@ -54,37 +54,27 @@ export async function AuthController(req, res) {
 }
 
 export async function loginUser(req, res) {
-  let { UserName, Password } = req.body;
+  let { username, password } = req.body;
 
-  if (!UserName || !Password) {
-    return res.status(400).json({ error: "all fields are required" });
+  username = username.trim();
+  password = password.trim();
+  const db = await getDBConnection();
+  const LogUser = await db.get(
+    `SELECT * FROM users WHERE LOWER(username)=LOWER(?)`,
+    [username],
+  );
+  if (!LogUser) {
+    return res.status(401).json({ error: "Invalid credentials" });
   }
 
-  UserName = UserName.trim();
-  Password = Password.trim();
+  const isPasswordValid = await bcrypt.compare(password, LogUser.password);
+  if (isPasswordValid === false) {
+    return res.status(401).json({ error: "Invalid credentials" });
+  }
 
-  try {
-    const db = await getDBConnection();
-    const LogUser = await db.get(
-      `SELECT * FROM users WHERE LOWER(username)=LOWER(?)`,
-      [UserName],
-    );
-    if (!LogUser) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-
-    const isPasswordValid = await bcrypt.compare(Password, LogUser.password);
-    if (isPasswordValid === false) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-
-    if (isPasswordValid === true) {
-      req.session.userId = LogUser.id;
-      res.json({ message: "Logged in" });
-    }
-  } catch (err) {
-    console.error("Login error:", err.message);
-    res.status(500).json({ error: "Login failed. Please try again." });
+  if (isPasswordValid === true) {
+    req.session.userId = LogUser.id;
+    res.json({ message: "Logged in" });
   }
 }
 
