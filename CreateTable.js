@@ -73,7 +73,6 @@ GETTING DATA
     await db.exec("COMMIT");
     console.log("Done inserting data");
   } catch (error) {
-    // Fix 2: Await the rollback to ensure it completes before handling the error
     await db.exec("ROLLBACK");
     console.error("Error inserting data:", error);
   } finally {

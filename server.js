@@ -14,9 +14,6 @@ const PORT = 3000;
 const app = express();
 const secret = process.env.SPIRAL_SESSION_SECRET;
 
-//app.use(cors()); // Enable CORS(cross-origin-resource-sharing) for all routes
-
-//app.use("/api", appRoute);
 app.use(express.json()); // Middleware to parse JSON bodies from incoming requests
 // Configure session middleware for Express
 app.use(

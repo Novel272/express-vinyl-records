@@ -4,10 +4,14 @@ This project is a beginner-friendly Express.js application that is a simple prod
 
 ## Features
 
-- **Product listing**: Displays a list of vinyl records.
-- **Search**: Instantly filter products by title, artist, or genre.
-- **Dropdown filter**: Filter products by genre using a dropdown menu.
-- **Static frontend**: Simple HTML/CSS/JS frontend served by Express.
+- **Product Listing**: View a list of products with details such as name, description, price, and image.
+- **Search Functionality**: Search for products based on keywords.
+- **Filtering**: Filter the product list by genre, price range, and availability.
+- **Authentication**: Sign up, log in, and log out using email, username, and password.
+- **User Cart**: Add products to the cart and manage cart items.
+- **User Orders**: Create and manage orders, including adding items and updating order details.
+- **Backend API**: RESTful API for interacting with product and user data.
+- **Frontend**: Renders the product list, handles user input for search and filter, and manages user authentication and cart functionality.
 
 ## Getting Started
 
@@ -39,9 +43,18 @@ The app will be available at [http://localhost:3000](http://localhost:3000).
 
 - `server.js` – Main Express server file
 - `controller/ProductsController.js` – API logic for products and genres
+- `controller/AuthController.js` – API logic for authentication (Sign Up, Login, Logout)
+- `controller/CartController.js` – API logic for managing user cart
+- `controller/OrderController.js` – API logic for managing user orders
 - `route/products.js` – Express router for product endpoints
+- `route/auth.js` – Express router for authentication endpoints
+- `route/cart.js` – Express router for cart endpoints
+- `route/orders.js` – Express router for order endpoints
 - `public/` – Static frontend files (HTML, CSS, JS, images)
 - `db/db.js` – SQLite database connection
+- `db/models/User.js` – User model for database operations
+- `db/models/Product.js` – Product model for database operations
+- `db/models/Order.js` – Order model for database operations
 
 ## API Endpoints
 
@@ -65,6 +78,30 @@ The app will be available at [http://localhost:3000](http://localhost:3000).
 ### Dropdown Filter (Example 2)
 
 <img src="public/screenshot/dropdown2.jpg" alt="Dropdown Filter 2" width="600" />
+
+### Sign-up
+
+<img src="public/screenshot/signup.jpg" alt="Sign-Up" width="600" />
+
+### Log-in
+
+<img src="public/screenshot/LogIn.jpg" alt="Log-In" width="600" />
+
+### Wrong password or username
+
+<img src="public/screenshot/Wronglogin.jpg" alt="Wrong-Log-in" width="600" />
+
+### Adding to cart
+
+<img src="public/screenshot/addToCart.jpg" alt="adding-to-cart" width="600" />
+
+### Account Cart
+
+<img src="public/screenshot/Cart1.jpg" alt="Cart1" width="600" />
+
+### Account Cart 2
+
+<img src="public/screenshot/cart2.jpg" alt="Cart2" width="600" />
 
 ---
 
