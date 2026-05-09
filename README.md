@@ -60,6 +60,10 @@ The app will be available at [http://localhost:3000](http://localhost:3000).
 
 - `GET /api/products` – List all products (supports `search` and `genreFilter` query params)
 - `GET /api/products/genres` – List all available genres
+- `GET /api/products/:id` – Retrieve a specific product by ID
+- `POST /api/products` – Create a new product
+- `PUT /api/products/:id` – Update a specific product by ID
+- `DELETE /api/products/:id` – Delete a specific product by ID
 
 ## Screenshots
 
